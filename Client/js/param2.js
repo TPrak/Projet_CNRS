@@ -91,22 +91,27 @@ options.series = [
   }
 ]/*********************************** Recupération du json et parsage*/
 
-$.getJSON('http://perso.imerir.com/jsabbatier/test/fuckjson.html', function(mesure) {
+$.getJSON('http://perso.imerir.com/jsabbatier/test/fuckjson.html', function(mesure) 
+{
  
-    $.each(mesure, function(i,e){
+    $.each(mesure, function(i,e)
+    {
  
       var theDate = new Date(parseInt(i),0,1);
  
       options.series[0].data.push(e.temperature);
+      <?echo ("Temperature ".temperature);?>
       options.series[1].data.push(e.humidite);
+       
       options.series[2].data.push(e.pression);
+      
       options.xAxis.categories.push(i);
  
     })
     console.log(options.categories)
     chart = new Highcharts.Chart(options);
  
-  });
+});
 
 
 
