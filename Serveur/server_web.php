@@ -1,6 +1,9 @@
 <?php
 include "connexion_bdd.php"; // fichier contenant les infos pour la connexion a la base de donees
 
+$tensionMax = 13;
+$tensionMin = 11.7;
+
 if (isset($_POST["capteur"]) && isset($_POST["dateDebut"]) && isset($_POST["dateFin"])) // si il manque le nom du capteur, la date de debut, la date de fin, on ne fait rien
 {	
 	$dbh = new PDO('mysql:host='.$host.';dbname='.$db, $user, $pass); // accès à la base de données
@@ -65,6 +68,11 @@ if (isset($_POST["capteur"]) && isset($_POST["dateDebut"]) && isset($_POST["date
 				else if ($value2 >= 549 && $value2 <= 670)	{$value2 = "NO";}
 				else if ($value2 >= 670 && $value2 <= 790)	{$value2 = "O" ;}
 				$json[$cle][$capteur] = $value2;
+	    	}else if ($capteur == "batterie"){
+	    		// calcul qui permet de convertir la tension en pourcent
+	    		// on ramene la tension entre 0 et 1.3 (tensionMax - tensionMin)
+	    		// et on calcule le pourcentage avec un arrondi a l'unite
+	    		$json[$cle][$capteur] = round((($value2-$tensionMin)*100)/($tensionMax-$tensionMin));
 	    	}else{
 				$json[$cle][$capteur] = floatval($value2);
 	    	}
