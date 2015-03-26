@@ -23,11 +23,21 @@ if (isset($_POST["capteur"]) && isset($_POST["dateDebut"]) && isset($_POST["date
 		$id_capteur = "4";
 		$stmt->bindParam(':id_capteur', $id_capteur);	// association de la variable $id_capteur au parametre :id_capteur 
 
+	}else if (($_POST["capteur"] == "fvent") || ($_POST["capteur"] == "dvent")){
+		// la requete renvoie uniquement la valeur la plus recente pour la batterie
+		$stmt = $dbh->prepare("SELECT date_time, nom, val FROM donnees, capteurs WHERE donnees.id_capteur = capteurs.id_capteur AND (donnees.id_capteur LIKE :id_capteur OR donnees.id_capteur LIKE :id_capteur2) ORDER BY date_time DESC;");
+		
+		$id_capteur = "5";
+		$id_capteur2 = "6";
+		$stmt->bindParam(':id_capteur', $id_capteur);	// association de la variable $id_capteur au parametre :id_capteur 
+		$stmt->bindParam(':id_capteur2', $id_capteur2);	// association de la variable $id_capteur2 au parametre :id_capteur2 
+
 	}else{
 		// la requete va chercher toutes les donnees d'un capteur entre 2 dates, et les renvoie dans l'ordre de la plus ancienne a la plus recente
 		$stmt = $dbh->prepare("SELECT date_time, nom, val FROM donnees, capteurs WHERE donnees.id_capteur = capteurs.id_capteur AND donnees.id_capteur LIKE :id_capteur AND date_time BETWEEN :dateDebut AND :dateFin ORDER BY date_time ASC;");
 		
 		switch ($_POST["capteur"]){ // selon le capteur demande, on renseigne le bon id_capteur (valeur de la base de donnees)
+			case "pluie": $id_capteur = "7"; break;
 			case "temperature": $id_capteur = "3";break; 
 			case "pression": $id_capteur = "2";break;
 			case "humidite": $id_capteur = "1";break;
@@ -59,14 +69,14 @@ if (isset($_POST["capteur"]) && isset($_POST["dateDebut"]) && isset($_POST["date
 	    else if($key2 == "val"){  // renseigne la valeur du capteur
 	    	
 	    	if ($capteur == "dvent"){
-	    	  	if ($value2 >= 390 && $value2 <= 500)		{$value2 = "N" ;}
-				else if ($value2 >= 197 && $value2 <= 210)	{$value2 = "NE";}
-				else if ($value2 >= 34 && $value2 <= 45)	{$value2 = "E" ;}
-				else if ($value2 >= 50 && $value2 <= 76)	{$value2 = "SE";}
-				else if ($value2 >= 90 && $value2 <= 120)	{$value2 = "S" ;}
-				else if ($value2 >= 300 && $value2 <= 345)	{$value2 = "SO";}
-				else if ($value2 >= 549 && $value2 <= 670)	{$value2 = "NO";}
-				else if ($value2 >= 670 && $value2 <= 790)	{$value2 = "O" ;}
+	    	  	if ($value2 >= 390 && $value2 <= 500)		{$value2 = 0;}	// N
+				else if ($value2 >= 197 && $value2 <= 210)	{$value2 = 1;}	// NE
+				else if ($value2 >= 34 && $value2 <= 45)	{$value2 = 2;}	// E
+				else if ($value2 >= 50 && $value2 <= 76)	{$value2 = 3;}	// SE
+				else if ($value2 >= 90 && $value2 <= 120)	{$value2 = 4;}	// S
+				else if ($value2 >= 300 && $value2 <= 345)	{$value2 = 5;}	// SO
+				else if ($value2 >= 549 && $value2 <= 670)	{$value2 = 6;}	// NO
+				else if ($value2 >= 670 && $value2 <= 790)	{$value2 = 7;}	// O
 				$json[$cle][$capteur] = $value2;
 	    	}else if ($capteur == "batterie"){
 	    		// calcul qui permet de convertir la tension en pourcent
